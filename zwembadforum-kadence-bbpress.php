@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zwembadforum Kadence bbPress
  * Description: Modernere Kadence styling en lichte hygiene voor de bbPress frontend van Zwembadforum.
- * Version: 0.4.0
+ * Version: 0.4.1
  * Author: Codex
  * Requires at least: 6.3
  * Requires PHP: 7.4
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZF_KADENCE_BBP_VERSION', '0.4.0' );
+define( 'ZF_KADENCE_BBP_VERSION', '0.4.1' );
 define( 'ZF_KADENCE_BBP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZF_KADENCE_BBP_URL', plugin_dir_url( __FILE__ ) );
 define( 'ZF_KADENCE_BBP_OPTION', 'zf_kadence_bbp_settings' );
@@ -120,6 +120,7 @@ function zf_kadence_bbp_rest_update_settings( WP_REST_Request $request ): WP_RES
 
 	$settings = zf_kadence_bbp_sanitize_settings( array_merge( $current, $input ) );
 	update_option( ZF_KADENCE_BBP_OPTION, $settings );
+	zf_kadence_bbp_clear_update_cache();
 
 	return rest_ensure_response( $settings );
 }

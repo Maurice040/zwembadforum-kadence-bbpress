@@ -53,6 +53,11 @@ Vul de raw URL van dat manifest in bij `Update manifest URL`. Daarna ziet WordPr
 - Sponsorblok onder de vraag wordt visueel onderdeel van de topicflow.
 - Topic starter en reacties krijgen een compactere, rustiger auteurkolom.
 
+## Versie 0.4.1
+
+- Testrelease voor de GitHub updater.
+- Wist de update-manifest cache wanneer instellingen via REST worden opgeslagen.
+
 ## Wat deze plugin niet doet
 
 - Geen datamigratie.
