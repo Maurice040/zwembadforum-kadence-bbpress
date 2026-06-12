@@ -58,6 +58,10 @@ Vul de raw URL van dat manifest in bij `Update manifest URL`. Daarna ziet WordPr
 - Testrelease voor de GitHub updater.
 - Wist de update-manifest cache wanneer instellingen via REST worden opgeslagen.
 
+## Versie 0.4.2
+
+- Lijnt de kolomtitels van topiclijsten uit met de inhoudskolommen.
+
 ## Wat deze plugin niet doet
 
 - Geen datamigratie.
