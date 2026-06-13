@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zwembadforum Kadence bbPress
  * Description: Modernere Kadence styling en lichte hygiene voor de bbPress frontend van Zwembadforum.
- * Version: 0.5.0
+ * Version: 0.5.1
  * Author: Codex
  * Requires at least: 6.3
  * Requires PHP: 7.4
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZF_KADENCE_BBP_VERSION', '0.5.0' );
+define( 'ZF_KADENCE_BBP_VERSION', '0.5.1' );
 define( 'ZF_KADENCE_BBP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZF_KADENCE_BBP_URL', plugin_dir_url( __FILE__ ) );
 define( 'ZF_KADENCE_BBP_OPTION', 'zf_kadence_bbp_settings' );
@@ -23,6 +23,7 @@ define( 'ZF_KADENCE_BBP_UPDATE_TRANSIENT', 'zf_kadence_bbp_update_manifest' );
 function zf_kadence_bbp_default_settings(): array {
 	return array(
 		'enable_forum_ui'         => 1,
+		'style_front_page_widget' => 1,
 		'compact_cards'           => 0,
 		'style_affiliate_ads'     => 1,
 		'add_ugc_nofollow'        => 1,
@@ -49,7 +50,7 @@ function zf_kadence_bbp_sanitize_settings( array $input ): array {
 	$defaults = zf_kadence_bbp_default_settings();
 	$output   = array();
 
-	foreach ( array( 'enable_forum_ui', 'compact_cards', 'style_affiliate_ads', 'add_ugc_nofollow', 'remove_guest_editor_js' ) as $key ) {
+	foreach ( array( 'enable_forum_ui', 'style_front_page_widget', 'compact_cards', 'style_affiliate_ads', 'add_ugc_nofollow', 'remove_guest_editor_js' ) as $key ) {
 		$output[ $key ] = empty( $input[ $key ] ) ? 0 : 1;
 	}
 
@@ -176,6 +177,7 @@ function zf_kadence_bbp_render_settings_page(): void {
 					<th scope="row">Forum uiterlijk</th>
 					<td>
 						<?php zf_kadence_bbp_render_checkbox( $settings, 'enable_forum_ui', 'Kadence forumstyling inschakelen', 'Laadt de moderne forumlayout op bbPress pagina’s.' ); ?>
+						<?php zf_kadence_bbp_render_checkbox( $settings, 'style_front_page_widget', 'Voorpagina forumwidget stylen', 'Laadt dezelfde styling en het Forum CSS veld ook op de voorpagina, voor het forumoverzicht in de widget.' ); ?>
 						<?php zf_kadence_bbp_render_checkbox( $settings, 'compact_cards', 'Compactere forumkaarten', 'Maakt lijsten iets dichter voor pagina’s met veel onderwerpen.' ); ?>
 					</td>
 				</tr>
@@ -216,7 +218,7 @@ function zf_kadence_bbp_render_settings_page(): void {
 					<th scope="row"><label for="zf-custom-css">Forum CSS</label></th>
 					<td>
 						<textarea id="zf-custom-css" class="large-text code" rows="16" name="<?php echo esc_attr( ZF_KADENCE_BBP_OPTION . '[custom_css]' ); ?>" spellcheck="false"><?php echo esc_textarea( $settings['custom_css'] ); ?></textarea>
-						<p class="description">Wordt alleen op bbPress/forum-schermen geladen, na de vaste plugin-CSS. Gebruik bij voorkeur <code>.zf-forum-ui</code> als scope.</p>
+						<p class="description">Wordt geladen op bbPress/forum-schermen en, als die optie aanstaat, op de voorpagina. Gebruik bij voorkeur <code>.zf-forum-ui</code> als scope.</p>
 					</td>
 				</tr>
 				<tr>
@@ -249,14 +251,22 @@ function zf_kadence_bbp_is_forum_screen(): bool {
 	return false;
 }
 
-function zf_kadence_bbp_enqueue_assets(): void {
-	if ( ! zf_kadence_bbp_is_forum_screen() ) {
-		return;
+function zf_kadence_bbp_is_front_page_widget_screen( array $settings ): bool {
+	return ! empty( $settings['style_front_page_widget'] ) && is_front_page();
+}
+
+function zf_kadence_bbp_should_load_assets( array $settings ): bool {
+	if ( empty( $settings['enable_forum_ui'] ) ) {
+		return false;
 	}
 
+	return zf_kadence_bbp_is_forum_screen() || zf_kadence_bbp_is_front_page_widget_screen( $settings );
+}
+
+function zf_kadence_bbp_enqueue_assets(): void {
 	$settings = zf_kadence_bbp_get_settings();
 
-	if ( empty( $settings['enable_forum_ui'] ) ) {
+	if ( ! zf_kadence_bbp_should_load_assets( $settings ) ) {
 		return;
 	}
 
@@ -287,8 +297,12 @@ add_action( 'wp_enqueue_scripts', 'zf_kadence_bbp_enqueue_assets', 50 );
 function zf_kadence_bbp_body_classes( array $classes ): array {
 	$settings = zf_kadence_bbp_get_settings();
 
-	if ( zf_kadence_bbp_is_forum_screen() && ! empty( $settings['enable_forum_ui'] ) ) {
+	if ( zf_kadence_bbp_should_load_assets( $settings ) ) {
 		$classes[] = 'zf-forum-ui';
+
+		if ( zf_kadence_bbp_is_front_page_widget_screen( $settings ) ) {
+			$classes[] = 'zf-forum-view-front-widget';
+		}
 
 		if ( function_exists( 'bbp_is_forum_archive' ) && bbp_is_forum_archive() ) {
 			$classes[] = 'zf-forum-view-index';

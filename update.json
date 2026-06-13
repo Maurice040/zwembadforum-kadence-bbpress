@@ -1,9 +1,9 @@
 {
-  "version": "0.5.0",
-  "download_url": "https://github.com/Maurice040/zwembadforum-kadence-bbpress/releases/download/v0.5.0/zwembadforum-kadence-bbpress-0.5.0.zip",
+  "version": "0.5.1",
+  "download_url": "https://github.com/Maurice040/zwembadforum-kadence-bbpress/releases/download/v0.5.1/zwembadforum-kadence-bbpress-0.5.1.zip",
   "homepage": "https://zwembadforum.eu",
   "requires": "6.3",
   "requires_php": "7.4",
   "tested": "6.8",
-  "changelog": "<ul><li>Voegt een beheerbaar Forum CSS veld toe zodat styling zonder pluginupdate kan worden aangepast.</li></ul>"
+  "changelog": "<ul><li>Laadt forumstyling optioneel ook op de voorpagina voor het forumoverzicht in de widget.</li></ul>"
 }

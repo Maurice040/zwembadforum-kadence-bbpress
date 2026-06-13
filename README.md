@@ -4,7 +4,8 @@ Beheerbare frontendlaag voor bbPress op Kadence.
 
 ## Wat deze plugin doet
 
-- Laadt alleen op bbPress/forum-schermen.
+- Laadt standaard alleen op bbPress/forum-schermen.
+- Kan dezelfde forumstyling ook op de voorpagina laden voor een forumoverzicht-widget.
 - Geeft forumoverzichten een card/list layout.
 - Maakt topic replies rustiger en beter scanbaar.
 - Geeft topicpagina’s een aparte vraag-en-antwoord layout.
@@ -21,6 +22,7 @@ Beheerbare frontendlaag voor bbPress op Kadence.
 ## Instellingen
 
 - Kadence forumstyling aan/uit.
+- Voorpagina forumwidget stylen.
 - Compactere forumkaarten.
 - Bouwzelfjezwembad bannerpositie stylen.
 - UGC/nofollow op externe forumlinks.
@@ -36,13 +38,13 @@ Zet een JSON bestand online, bijvoorbeeld in GitHub:
 
 ```json
 {
-  "version": "0.5.0",
-  "download_url": "https://github.com/<owner>/zwembadforum-kadence-bbpress/releases/download/v0.5.0/zwembadforum-kadence-bbpress-0.5.0.zip",
+  "version": "0.5.1",
+  "download_url": "https://github.com/<owner>/zwembadforum-kadence-bbpress/releases/download/v0.5.1/zwembadforum-kadence-bbpress-0.5.1.zip",
   "homepage": "https://zwembadforum.eu",
   "requires": "6.3",
   "requires_php": "7.4",
   "tested": "6.8",
-  "changelog": "<ul><li>Voegt een beheerbaar Forum CSS veld toe.</li></ul>"
+  "changelog": "<ul><li>Laadt forumstyling optioneel ook op de voorpagina voor het forumoverzicht in de widget.</li></ul>"
 }
 ```
 
@@ -69,6 +71,12 @@ Vul de raw URL van dat manifest in bij `Update manifest URL`. Daarna ziet WordPr
 - Voegt een leesbaar Forum CSS veld toe onder `Instellingen > Zwembadforum bbPress`.
 - Laadt deze CSS alleen op bbPress/forum-schermen, na de vaste plugin-CSS.
 - Maakt styling-aanpassingen via instellingen en REST mogelijk zonder nieuwe pluginrelease.
+
+## Versie 0.5.1
+
+- Voegt de instelling `Voorpagina forumwidget stylen` toe.
+- Laadt de vaste forum-CSS en het Forum CSS veld ook op de voorpagina wanneer deze optie aanstaat.
+- Voegt de body class `zf-forum-view-front-widget` toe voor gerichte CSS op de voorpagina.
 
 ## Wat deze plugin niet doet
 
