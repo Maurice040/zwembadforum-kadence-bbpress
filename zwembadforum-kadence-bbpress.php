@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zwembadforum Kadence bbPress
  * Description: Modernere Kadence styling en lichte hygiene voor de bbPress frontend van Zwembadforum.
- * Version: 0.4.2
+ * Version: 0.5.0
  * Author: Codex
  * Requires at least: 6.3
  * Requires PHP: 7.4
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZF_KADENCE_BBP_VERSION', '0.4.2' );
+define( 'ZF_KADENCE_BBP_VERSION', '0.5.0' );
 define( 'ZF_KADENCE_BBP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZF_KADENCE_BBP_URL', plugin_dir_url( __FILE__ ) );
 define( 'ZF_KADENCE_BBP_OPTION', 'zf_kadence_bbp_settings' );
@@ -30,6 +30,7 @@ function zf_kadence_bbp_default_settings(): array {
 		'accent_color'            => '#087f8c',
 		'accent_dark_color'       => '#0b3f4d',
 		'max_content_width'       => 1120,
+		'custom_css'              => '',
 		'update_manifest_url'     => '',
 	);
 }
@@ -56,9 +57,21 @@ function zf_kadence_bbp_sanitize_settings( array $input ): array {
 	$output['accent_dark_color'] = sanitize_hex_color( $input['accent_dark_color'] ?? $defaults['accent_dark_color'] ) ?: $defaults['accent_dark_color'];
 	$output['max_content_width'] = absint( $input['max_content_width'] ?? $defaults['max_content_width'] );
 	$output['max_content_width'] = min( 1400, max( 860, $output['max_content_width'] ) );
+	$output['custom_css']        = zf_kadence_bbp_sanitize_custom_css( $input['custom_css'] ?? $defaults['custom_css'] );
 	$output['update_manifest_url'] = esc_url_raw( $input['update_manifest_url'] ?? $defaults['update_manifest_url'] );
 
 	return $output;
+}
+
+function zf_kadence_bbp_sanitize_custom_css( $css ): string {
+	$css = (string) $css;
+	$css = str_replace( array( "\r\n", "\r" ), "\n", $css );
+	$css = preg_replace( '#</?style[^>]*>#i', '', $css );
+	$css = preg_replace( '/@import\b[^;]*;?/i', '', $css );
+	$css = preg_replace( '/expression\s*\(/i', 'blocked-expression(', $css );
+	$css = preg_replace( '/javascript\s*:/i', '', $css );
+
+	return trim( $css );
 }
 
 function zf_kadence_bbp_activate(): void {
@@ -200,6 +213,13 @@ function zf_kadence_bbp_render_settings_page(): void {
 					</td>
 				</tr>
 				<tr>
+					<th scope="row"><label for="zf-custom-css">Forum CSS</label></th>
+					<td>
+						<textarea id="zf-custom-css" class="large-text code" rows="16" name="<?php echo esc_attr( ZF_KADENCE_BBP_OPTION . '[custom_css]' ); ?>" spellcheck="false"><?php echo esc_textarea( $settings['custom_css'] ); ?></textarea>
+						<p class="description">Wordt alleen op bbPress/forum-schermen geladen, na de vaste plugin-CSS. Gebruik bij voorkeur <code>.zf-forum-ui</code> als scope.</p>
+					</td>
+				</tr>
+				<tr>
 					<th scope="row"><label for="zf-update-manifest-url">Update manifest URL</label></th>
 					<td>
 						<input id="zf-update-manifest-url" type="url" class="large-text code" name="<?php echo esc_attr( ZF_KADENCE_BBP_OPTION . '[update_manifest_url]' ); ?>" value="<?php echo esc_attr( $settings['update_manifest_url'] ); ?>" placeholder="https://raw.githubusercontent.com/.../update.json">
@@ -255,6 +275,12 @@ function zf_kadence_bbp_enqueue_assets(): void {
 	);
 
 	wp_add_inline_style( 'zf-kadence-bbpress', $inline_css );
+
+	$custom_css = trim( (string) ( $settings['custom_css'] ?? '' ) );
+
+	if ( '' !== $custom_css ) {
+		wp_add_inline_style( 'zf-kadence-bbpress', "\n/* Zwembadforum custom forum CSS */\n" . $custom_css );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'zf_kadence_bbp_enqueue_assets', 50 );
 

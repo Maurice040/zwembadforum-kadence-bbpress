@@ -13,6 +13,7 @@ Beheerbare frontendlaag voor bbPress op Kadence.
 - Dequeuet optioneel de bbPress editor JS voor uitgelogde bezoekers.
 - Stylet optioneel de bestaande Bouwzelfjezwembad bannerpositie onder de vraag.
 - Heeft een instellingenpagina onder `Instellingen > Zwembadforum bbPress`.
+- Heeft een leesbaar Forum CSS veld waarmee styling kan worden aangepast zonder pluginupdate.
 - Heeft een REST endpoint voor beheer via application password:
   `/wp-json/zf-kadence-bbpress/v1/settings`.
 - Heeft een eigen updatechecker op basis van een JSON manifest, zodat toekomstige versies via de normale WordPress plugin-updater kunnen lopen.
@@ -26,6 +27,7 @@ Beheerbare frontendlaag voor bbPress op Kadence.
 - bbPress editor JS uitschakelen voor gasten.
 - Accentkleuren.
 - Maximale forum breedte.
+- Forum CSS, alleen geladen op bbPress/forum-schermen.
 - Update manifest URL.
 
 ## Updates zonder zip-upload
@@ -34,13 +36,13 @@ Zet een JSON bestand online, bijvoorbeeld in GitHub:
 
 ```json
 {
-  "version": "0.4.1",
-  "download_url": "https://github.com/<owner>/zwembadforum-kadence-bbpress/releases/download/v0.4.1/zwembadforum-kadence-bbpress-0.4.1.zip",
+  "version": "0.5.0",
+  "download_url": "https://github.com/<owner>/zwembadforum-kadence-bbpress/releases/download/v0.5.0/zwembadforum-kadence-bbpress-0.5.0.zip",
   "homepage": "https://zwembadforum.eu",
   "requires": "6.3",
   "requires_php": "7.4",
   "tested": "6.8",
-  "changelog": "<ul><li>Korte beschrijving van de update.</li></ul>"
+  "changelog": "<ul><li>Voegt een beheerbaar Forum CSS veld toe.</li></ul>"
 }
 ```
 
@@ -61,6 +63,12 @@ Vul de raw URL van dat manifest in bij `Update manifest URL`. Daarna ziet WordPr
 ## Versie 0.4.2
 
 - Lijnt de kolomtitels van topiclijsten uit met de inhoudskolommen.
+
+## Versie 0.5.0
+
+- Voegt een leesbaar Forum CSS veld toe onder `Instellingen > Zwembadforum bbPress`.
+- Laadt deze CSS alleen op bbPress/forum-schermen, na de vaste plugin-CSS.
+- Maakt styling-aanpassingen via instellingen en REST mogelijk zonder nieuwe pluginrelease.
 
 ## Wat deze plugin niet doet
 
