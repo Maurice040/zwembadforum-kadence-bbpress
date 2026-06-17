@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zwembadforum Kadence bbPress
  * Description: Modernere Kadence styling en lichte hygiene voor de bbPress frontend van Zwembadforum.
- * Version: 0.5.1
+ * Version: 0.6.0
  * Author: Codex
  * Requires at least: 6.3
  * Requires PHP: 7.4
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZF_KADENCE_BBP_VERSION', '0.5.1' );
+define( 'ZF_KADENCE_BBP_VERSION', '0.6.0' );
 define( 'ZF_KADENCE_BBP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZF_KADENCE_BBP_URL', plugin_dir_url( __FILE__ ) );
 define( 'ZF_KADENCE_BBP_OPTION', 'zf_kadence_bbp_settings' );
@@ -26,6 +26,10 @@ function zf_kadence_bbp_default_settings(): array {
 		'style_front_page_widget' => 1,
 		'compact_cards'           => 0,
 		'style_affiliate_ads'     => 1,
+		'managed_ads_enabled'     => 0,
+		'managed_ads_safe_mode'   => 1,
+		'managed_ads_label'       => 'Partner',
+		'managed_ads_banners'     => '',
 		'add_ugc_nofollow'        => 1,
 		'remove_guest_editor_js'  => 1,
 		'accent_color'            => '#087f8c',
@@ -50,7 +54,7 @@ function zf_kadence_bbp_sanitize_settings( array $input ): array {
 	$defaults = zf_kadence_bbp_default_settings();
 	$output   = array();
 
-	foreach ( array( 'enable_forum_ui', 'style_front_page_widget', 'compact_cards', 'style_affiliate_ads', 'add_ugc_nofollow', 'remove_guest_editor_js' ) as $key ) {
+	foreach ( array( 'enable_forum_ui', 'style_front_page_widget', 'compact_cards', 'style_affiliate_ads', 'managed_ads_enabled', 'managed_ads_safe_mode', 'add_ugc_nofollow', 'remove_guest_editor_js' ) as $key ) {
 		$output[ $key ] = empty( $input[ $key ] ) ? 0 : 1;
 	}
 
@@ -58,10 +62,41 @@ function zf_kadence_bbp_sanitize_settings( array $input ): array {
 	$output['accent_dark_color'] = sanitize_hex_color( $input['accent_dark_color'] ?? $defaults['accent_dark_color'] ) ?: $defaults['accent_dark_color'];
 	$output['max_content_width'] = absint( $input['max_content_width'] ?? $defaults['max_content_width'] );
 	$output['max_content_width'] = min( 1400, max( 860, $output['max_content_width'] ) );
+	$output['managed_ads_label'] = sanitize_text_field( $input['managed_ads_label'] ?? $defaults['managed_ads_label'] );
+	$output['managed_ads_banners'] = zf_kadence_bbp_sanitize_ad_banners( $input['managed_ads_banners'] ?? $defaults['managed_ads_banners'] );
 	$output['custom_css']        = zf_kadence_bbp_sanitize_custom_css( $input['custom_css'] ?? $defaults['custom_css'] );
 	$output['update_manifest_url'] = esc_url_raw( $input['update_manifest_url'] ?? $defaults['update_manifest_url'] );
 
 	return $output;
+}
+
+function zf_kadence_bbp_sanitize_ad_banners( $banners ): string {
+	$lines = preg_split( '/\R/', (string) $banners );
+	$clean = array();
+
+	foreach ( $lines as $line ) {
+		$line = trim( $line );
+
+		if ( '' === $line || 0 === strpos( $line, '#' ) ) {
+			$clean[] = $line;
+			continue;
+		}
+
+		$parts = array_map( 'trim', explode( '|', $line ) );
+		$desktop_image = esc_url_raw( $parts[0] ?? '' );
+		$mobile_image  = esc_url_raw( $parts[1] ?? '' );
+		$click_url     = esc_url_raw( $parts[2] ?? '' );
+		$alt_text      = sanitize_text_field( $parts[3] ?? '' );
+		$weight        = max( 1, absint( $parts[4] ?? 1 ) );
+
+		if ( empty( $desktop_image ) || empty( $click_url ) ) {
+			continue;
+		}
+
+		$clean[] = implode( ' | ', array( $desktop_image, $mobile_image, $click_url, $alt_text, (string) $weight ) );
+	}
+
+	return trim( implode( "\n", $clean ) );
 }
 
 function zf_kadence_bbp_sanitize_custom_css( $css ): string {
@@ -185,6 +220,17 @@ function zf_kadence_bbp_render_settings_page(): void {
 					<th scope="row">Advertentieblok</th>
 					<td>
 						<?php zf_kadence_bbp_render_checkbox( $settings, 'style_affiliate_ads', 'Bouwzelfjezwembad bannerpositie stylen', 'Behoudt de bestaande advertentie onder de vraag en geeft desktop/mobiel banners nette spacing.' ); ?>
+						<?php zf_kadence_bbp_render_checkbox( $settings, 'managed_ads_enabled', 'Advertenties beheren vanuit deze plugin', 'Toont zelf een banner onder de vraag, zodat de losse bbp affiliate ads plugin later uit kan.' ); ?>
+						<?php zf_kadence_bbp_render_checkbox( $settings, 'managed_ads_safe_mode', 'Niet tonen zolang bbp affiliate ads actief is', 'Voorkomt dubbele advertenties tijdens de overstap. Zet pas uit als je bewust beide wilt testen.' ); ?>
+						<p>
+							<label for="zf-managed-ads-label"><strong>Advertentielabel</strong></label><br>
+							<input id="zf-managed-ads-label" type="text" class="regular-text" name="<?php echo esc_attr( ZF_KADENCE_BBP_OPTION . '[managed_ads_label]' ); ?>" value="<?php echo esc_attr( $settings['managed_ads_label'] ); ?>">
+						</p>
+						<p>
+							<label for="zf-managed-ads-banners"><strong>Banners</strong></label><br>
+							<textarea id="zf-managed-ads-banners" class="large-text code" rows="8" name="<?php echo esc_attr( ZF_KADENCE_BBP_OPTION . '[managed_ads_banners]' ); ?>" spellcheck="false" placeholder="desktop-afbeelding | mobiel-afbeelding | klik-url | alt-tekst | gewicht"><?php echo esc_textarea( $settings['managed_ads_banners'] ); ?></textarea>
+						</p>
+						<p class="description">Een banner per regel: <code>desktop-afbeelding | mobiel-afbeelding | klik-url | alt-tekst | gewicht</code>. Laat mobiel-afbeelding leeg om dezelfde afbeelding te gebruiken. Regels met <code>#</code> kun je als notitie gebruiken.</p>
 					</td>
 				</tr>
 				<tr>
@@ -369,6 +415,108 @@ function zf_kadence_bbp_remove_low_value_forum_assets(): void {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'zf_kadence_bbp_remove_low_value_forum_assets', 100 );
+
+function zf_kadence_bbp_is_legacy_ad_plugin_active(): bool {
+	$active_plugins = (array) get_option( 'active_plugins', array() );
+
+	return in_array( 'bbp-affiliate-ads/bbp-affiliate-ads.php', $active_plugins, true )
+		|| in_array( 'bbp-affiliate-ads/bbp-affiliate-ads', $active_plugins, true );
+}
+
+function zf_kadence_bbp_parse_managed_ads( string $source ): array {
+	$ads = array();
+
+	foreach ( preg_split( '/\R/', $source ) as $line ) {
+		$line = trim( $line );
+
+		if ( '' === $line || 0 === strpos( $line, '#' ) ) {
+			continue;
+		}
+
+		$parts         = array_map( 'trim', explode( '|', $line ) );
+		$desktop_image = esc_url_raw( $parts[0] ?? '' );
+		$mobile_image  = esc_url_raw( $parts[1] ?? '' );
+		$click_url     = esc_url_raw( $parts[2] ?? '' );
+		$alt_text      = sanitize_text_field( $parts[3] ?? '' );
+		$weight        = max( 1, absint( $parts[4] ?? 1 ) );
+
+		if ( empty( $desktop_image ) || empty( $click_url ) ) {
+			continue;
+		}
+
+		$ads[] = array(
+			'desktop_image' => $desktop_image,
+			'mobile_image'  => $mobile_image ?: $desktop_image,
+			'click_url'     => $click_url,
+			'alt_text'      => $alt_text ?: 'Bouwzelfjezwembad',
+			'weight'        => $weight,
+		);
+	}
+
+	return $ads;
+}
+
+function zf_kadence_bbp_pick_managed_ad( array $ads ): ?array {
+	if ( empty( $ads ) ) {
+		return null;
+	}
+
+	$total_weight = array_sum( wp_list_pluck( $ads, 'weight' ) );
+	$needle       = wp_rand( 1, max( 1, $total_weight ) );
+	$current      = 0;
+
+	foreach ( $ads as $ad ) {
+		$current += (int) $ad['weight'];
+
+		if ( $needle <= $current ) {
+			return $ad;
+		}
+	}
+
+	return $ads[0];
+}
+
+function zf_kadence_bbp_render_managed_topic_ad(): void {
+	static $rendered = false;
+
+	if ( $rendered || ! function_exists( 'bbp_is_single_topic' ) || ! bbp_is_single_topic() ) {
+		return;
+	}
+
+	$settings = zf_kadence_bbp_get_settings();
+
+	if ( empty( $settings['managed_ads_enabled'] ) ) {
+		return;
+	}
+
+	if ( ! empty( $settings['managed_ads_safe_mode'] ) && zf_kadence_bbp_is_legacy_ad_plugin_active() ) {
+		return;
+	}
+
+	$ad = zf_kadence_bbp_pick_managed_ad( zf_kadence_bbp_parse_managed_ads( (string) $settings['managed_ads_banners'] ) );
+
+	if ( ! $ad ) {
+		return;
+	}
+
+	$rendered = true;
+	$label    = trim( (string) ( $settings['managed_ads_label'] ?? '' ) );
+	?>
+	<div class="zf-managed-topic-ad" aria-label="<?php echo esc_attr( $label ?: 'Advertentie' ); ?>">
+		<?php if ( '' !== $label ) : ?>
+			<span class="zf-managed-topic-ad__label"><?php echo esc_html( $label ); ?></span>
+		<?php endif; ?>
+		<a class="zf-managed-topic-ad__link" href="<?php echo esc_url( $ad['click_url'] ); ?>" target="_blank" rel="sponsored nofollow noopener">
+			<picture>
+				<source media="(max-width: 700px)" srcset="<?php echo esc_url( $ad['mobile_image'] ); ?>">
+				<img src="<?php echo esc_url( $ad['desktop_image'] ); ?>" alt="<?php echo esc_attr( $ad['alt_text'] ); ?>" loading="lazy" decoding="async">
+			</picture>
+		</a>
+	</div>
+	<?php
+}
+add_action( 'bbp_theme_after_topic_content', 'zf_kadence_bbp_render_managed_topic_ad', 30 );
+add_action( 'bbp_template_after_lead_topic', 'zf_kadence_bbp_render_managed_topic_ad', 5 );
 
 function zf_kadence_bbp_get_update_manifest( bool $force = false ): ?array {
 	$settings     = zf_kadence_bbp_get_settings();

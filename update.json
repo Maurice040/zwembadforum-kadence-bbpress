@@ -1,9 +1,9 @@
 {
-  "version": "0.5.1",
-  "download_url": "https://github.com/Maurice040/zwembadforum-kadence-bbpress/releases/download/v0.5.1/zwembadforum-kadence-bbpress-0.5.1.zip",
+  "version": "0.6.0",
+  "download_url": "https://github.com/Maurice040/zwembadforum-kadence-bbpress/releases/download/v0.6.0/zwembadforum-kadence-bbpress-0.6.0.zip",
   "homepage": "https://zwembadforum.eu",
   "requires": "6.3",
   "requires_php": "7.4",
   "tested": "6.8",
-  "changelog": "<ul><li>Laadt forumstyling optioneel ook op de voorpagina voor het forumoverzicht in de widget.</li></ul>"
+  "changelog": "<ul><li>Voegt een geïntegreerde advertentiemodule toe voor de banner onder de vraag.</li><li>Ondersteunt meerdere banners met gewogen willekeur via een leesbaar instellingenveld.</li><li>Voorkomt standaard dubbele advertenties zolang de oude bbp affiliate ads plugin actief is.</li></ul>"
 }

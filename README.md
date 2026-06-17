@@ -13,6 +13,7 @@ Beheerbare frontendlaag voor bbPress op Kadence.
 - Voegt optioneel `ugc nofollow` toe aan externe links in topic/reply content.
 - Dequeuet optioneel de bbPress editor JS voor uitgelogde bezoekers.
 - Stylet optioneel de bestaande Bouwzelfjezwembad bannerpositie onder de vraag.
+- Kan de advertentie onder de vraag zelf beheren met wisselende banners, zodat de losse `bbp affiliate ads` plugin later uit kan.
 - Heeft een instellingenpagina onder `Instellingen > Zwembadforum bbPress`.
 - Heeft een leesbaar Forum CSS veld waarmee styling kan worden aangepast zonder pluginupdate.
 - Heeft een REST endpoint voor beheer via application password:
@@ -25,6 +26,9 @@ Beheerbare frontendlaag voor bbPress op Kadence.
 - Voorpagina forumwidget stylen.
 - Compactere forumkaarten.
 - Bouwzelfjezwembad bannerpositie stylen.
+- Advertenties beheren vanuit deze plugin.
+- Veilige advertentiemodus: niet tonen zolang de oude `bbp affiliate ads` plugin actief is.
+- Leesbaar bannerveld: `desktop-afbeelding | mobiel-afbeelding | klik-url | alt-tekst | gewicht`.
 - UGC/nofollow op externe forumlinks.
 - bbPress editor JS uitschakelen voor gasten.
 - Accentkleuren.
@@ -78,13 +82,20 @@ Vul de raw URL van dat manifest in bij `Update manifest URL`. Daarna ziet WordPr
 - Laadt de vaste forum-CSS en het Forum CSS veld ook op de voorpagina wanneer deze optie aanstaat.
 - Voegt de body class `zf-forum-view-front-widget` toe voor gerichte CSS op de voorpagina.
 
+## Versie 0.6.0
+
+- Voegt een geïntegreerde advertentiemodule toe voor de banner onder de vraag.
+- Ondersteunt meerdere banners met gewogen willekeur via een leesbaar instellingenveld.
+- Voorkomt standaard dubbele advertenties zolang de oude `bbp affiliate ads` plugin actief is.
+- Gebruikt `rel="sponsored nofollow"` voor advertentielinks.
+
 ## Wat deze plugin niet doet
 
 - Geen datamigratie.
 - Geen permalinkwijzigingen.
 - Geen bbPress/UM/Style Pack instellingen aanpassen.
 - Geen Kadence instellingen overschrijven.
-- Geen advertentieplugin verwijderen of vervangen.
+- Verwijdert of deactiveert de oude advertentieplugin niet automatisch.
 
 ## Testvolgorde
 
