@@ -1106,3 +1106,160 @@
 		padding-left: 0;
 	}
 }
+
+/* v0.6.5: restore a compact Zwembadforum header on Kadence. */
+.zf-kadence-header .site-header,
+.zf-kadence-header #masthead {
+	position: relative;
+	background: #ffffff;
+	border-bottom: 1px solid rgba(11, 63, 77, 0.1);
+	box-shadow: 0 8px 28px rgba(11, 63, 77, 0.08);
+}
+
+.zf-kadence-header .site-header::before,
+.zf-kadence-header #masthead::before {
+	content: "JOUW ZWEMBAD COMMUNITY VOOR NEDERLAND EN BELGIE";
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 34px;
+	padding: 0.35rem 1rem;
+	background: linear-gradient(90deg, #0b5d68 0%, #087f8c 50%, #0b5d68 100%);
+	color: #ffffff;
+	font-size: 0.78rem;
+	font-weight: 800;
+	letter-spacing: 0.16em;
+	line-height: 1.2;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.zf-kadence-header .site-main-header-wrap,
+.zf-kadence-header .site-header-row-container-inner,
+.zf-kadence-header .main-header-container,
+.zf-kadence-header .site-header-section {
+	background: transparent;
+}
+
+.zf-kadence-header .site-main-header-inner-wrap,
+.zf-kadence-header .site-header-row {
+	min-height: 88px;
+	align-items: center;
+}
+
+.zf-kadence-header .site-branding,
+.zf-kadence-header .site-branding a.brand {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 0.15rem;
+	text-decoration: none;
+}
+
+.zf-kadence-header .site-title,
+.zf-kadence-header .site-title a,
+.zf-kadence-header .site-branding .site-title {
+	margin: 0;
+	color: #17222b;
+	font-size: clamp(1.35rem, 2vw, 1.9rem);
+	font-weight: 900;
+	letter-spacing: 0.01em;
+	line-height: 1;
+	text-transform: uppercase;
+	text-decoration: none;
+}
+
+.zf-kadence-header .site-description,
+.zf-kadence-header .site-branding .site-description {
+	margin: 0;
+	color: #6c7a89;
+	font-size: clamp(0.78rem, 1.1vw, 0.98rem);
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	line-height: 1.2;
+	text-transform: uppercase;
+}
+
+.zf-kadence-header .main-navigation .primary-menu-container > ul,
+.zf-kadence-header .main-navigation .menu,
+.zf-kadence-header .header-navigation .header-menu-container > ul {
+	display: flex;
+	align-items: center;
+	gap: clamp(1rem, 2.1vw, 2rem);
+}
+
+.zf-kadence-header .main-navigation .primary-menu-container > ul > li > a,
+.zf-kadence-header .main-navigation .menu > li > a,
+.zf-kadence-header .header-navigation .header-menu-container > ul > li > a,
+.zf-kadence-header .mobile-navigation ul li a {
+	color: #536272;
+	font-size: 0.92rem;
+	font-weight: 850;
+	letter-spacing: 0.035em;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition: color 140ms ease, background-color 140ms ease;
+}
+
+.zf-kadence-header .main-navigation .primary-menu-container > ul > li > a:hover,
+.zf-kadence-header .main-navigation .primary-menu-container > ul > li.current-menu-item > a,
+.zf-kadence-header .main-navigation .menu > li > a:hover,
+.zf-kadence-header .header-navigation .header-menu-container > ul > li > a:hover,
+.zf-kadence-header .header-navigation .header-menu-container > ul > li.current-menu-item > a {
+	color: #0b5d68;
+}
+
+.zf-kadence-header .header-button,
+.zf-kadence-header .button,
+.zf-kadence-header .menu-item a[href*="stel-een-nieuwe-vraag"],
+.zf-kadence-header .menu-item a[href*="nieuwe-vraag"] {
+	border-radius: 999px;
+}
+
+.zf-kadence-header .entry-hero-container-inner {
+	background:
+		linear-gradient(180deg, rgba(8, 127, 140, 0.08), rgba(255, 255, 255, 0) 78%);
+}
+
+.zf-kadence-header .entry-hero {
+	padding-top: clamp(2.2rem, 5vw, 4.5rem);
+	padding-bottom: clamp(1.25rem, 3vw, 2.4rem);
+}
+
+.zf-kadence-header .entry-hero .entry-title {
+	max-width: 1050px;
+}
+
+@media (max-width: 1024px) {
+	.zf-kadence-header .site-main-header-inner-wrap,
+	.zf-kadence-header .site-header-row {
+		min-height: 74px;
+	}
+
+	.zf-kadence-header .site-header::before,
+	.zf-kadence-header #masthead::before {
+		min-height: 30px;
+		font-size: 0.68rem;
+		letter-spacing: 0.1em;
+	}
+}
+
+@media (max-width: 760px) {
+	.zf-kadence-header .site-title,
+	.zf-kadence-header .site-title a,
+	.zf-kadence-header .site-branding .site-title {
+		font-size: 1.25rem;
+	}
+
+	.zf-kadence-header .site-description,
+	.zf-kadence-header .site-branding .site-description {
+		font-size: 0.68rem;
+		letter-spacing: 0.04em;
+	}
+
+	.zf-kadence-header .entry-hero {
+		padding-top: 1.6rem;
+		padding-bottom: 1rem;
+	}
+}
