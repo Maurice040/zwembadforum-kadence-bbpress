@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zwembadforum Kadence bbPress
  * Description: Modernere Kadence styling en lichte hygiene voor de bbPress frontend van Zwembadforum.
- * Version: 0.6.9
+ * Version: 0.6.13
  * Author: Codex
  * Requires at least: 6.3
  * Requires PHP: 7.0
@@ -13,14 +13,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZF_KADENCE_BBP_VERSION', '0.6.9' );
-define( 'ZF_KADENCE_BBP_PATH', plugin_dir_path( __FILE__ ) );
-define( 'ZF_KADENCE_BBP_URL', plugin_dir_url( __FILE__ ) );
-define( 'ZF_KADENCE_BBP_OPTION', 'zf_kadence_bbp_settings' );
-define( 'ZF_KADENCE_BBP_BASENAME', plugin_basename( __FILE__ ) );
-define( 'ZF_KADENCE_BBP_UPDATE_TRANSIENT', 'zf_kadence_bbp_update_manifest' );
-define( 'ZF_KADENCE_BBP_SEEMS_UTF8_TRACE_OPTION', 'zf_kadence_bbp_seems_utf8_trace' );
-define( 'ZF_KADENCE_BBP_MU_COMPAT_FILE', WPMU_PLUGIN_DIR . '/zf-wp69-seems-utf8-compat.php' );
+if ( ! defined( 'ZF_KADENCE_BBP_VERSION' ) ) {
+	define( 'ZF_KADENCE_BBP_VERSION', '0.6.13' );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_PATH' ) ) {
+	define( 'ZF_KADENCE_BBP_PATH', plugin_dir_path( __FILE__ ) );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_URL' ) ) {
+	define( 'ZF_KADENCE_BBP_URL', plugin_dir_url( __FILE__ ) );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_OPTION' ) ) {
+	define( 'ZF_KADENCE_BBP_OPTION', 'zf_kadence_bbp_settings' );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_BASENAME' ) ) {
+	define( 'ZF_KADENCE_BBP_BASENAME', plugin_basename( __FILE__ ) );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_UPDATE_TRANSIENT' ) ) {
+	define( 'ZF_KADENCE_BBP_UPDATE_TRANSIENT', 'zf_kadence_bbp_update_manifest' );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_SEEMS_UTF8_TRACE_OPTION' ) ) {
+	define( 'ZF_KADENCE_BBP_SEEMS_UTF8_TRACE_OPTION', 'zf_kadence_bbp_seems_utf8_trace' );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_MU_COMPAT_FILE' ) ) {
+	define( 'ZF_KADENCE_BBP_MU_COMPAT_FILE', WPMU_PLUGIN_DIR . '/zf-wp69-seems-utf8-compat.php' );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_CSS_MIGRATION_OPTION' ) ) {
+	define( 'ZF_KADENCE_BBP_CSS_MIGRATION_OPTION', 'zf_kadence_bbp_css_migration_0613' );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_CSS_BACKUP_OPTION' ) ) {
+	define( 'ZF_KADENCE_BBP_CSS_BACKUP_OPTION', 'zf_kadence_bbp_custom_css_backup_0613' );
+}
+if ( ! defined( 'ZF_KADENCE_BBP_LEGACY_CSS_HASH' ) ) {
+	define( 'ZF_KADENCE_BBP_LEGACY_CSS_HASH', '459e9f1bd9f0c9aa5bee3e8151f69d474e7591c2f96d1d5e90464ead8cf04480' );
+}
 
 function zf_kadence_bbp_default_settings() {
 	return array(
@@ -262,6 +287,45 @@ function zf_kadence_bbp_register_settings() {
 }
 add_action( 'admin_init', 'zf_kadence_bbp_register_settings' );
 
+/**
+ * Move the known live CSS option to a cacheable asset without risking newer edits.
+ */
+function zf_kadence_bbp_migrate_legacy_custom_css() {
+	if ( get_option( ZF_KADENCE_BBP_CSS_MIGRATION_OPTION, false ) ) {
+		return;
+	}
+
+	$stored = get_option( ZF_KADENCE_BBP_OPTION, array() );
+	if ( ! is_array( $stored ) ) {
+		return;
+	}
+
+	$custom_css = trim( (string) ( isset( $stored['custom_css'] ) ? $stored['custom_css'] : '' ) );
+	if ( '' === $custom_css ) {
+		update_option( ZF_KADENCE_BBP_CSS_MIGRATION_OPTION, 'empty', false );
+		return;
+	}
+
+	if ( ! hash_equals( ZF_KADENCE_BBP_LEGACY_CSS_HASH, hash( 'sha256', $custom_css ) ) ) {
+		return;
+	}
+
+	update_option(
+		ZF_KADENCE_BBP_CSS_BACKUP_OPTION,
+		array(
+			'created_at' => current_time( 'mysql', true ),
+			'sha256'     => ZF_KADENCE_BBP_LEGACY_CSS_HASH,
+			'custom_css' => $custom_css,
+		),
+		false
+	);
+
+	$stored['custom_css'] = '';
+	update_option( ZF_KADENCE_BBP_OPTION, $stored );
+	update_option( ZF_KADENCE_BBP_CSS_MIGRATION_OPTION, 'migrated', false );
+}
+add_action( 'admin_init', 'zf_kadence_bbp_migrate_legacy_custom_css', 20 );
+
 function zf_kadence_bbp_register_rest_routes() {
 	register_rest_route(
 		'zf-kadence-bbpress/v1',
@@ -499,6 +563,13 @@ function zf_kadence_bbp_enqueue_assets() {
 		ZF_KADENCE_BBP_VERSION
 	);
 
+	wp_enqueue_style(
+		'zf-kadence-bbpress-overrides',
+		ZF_KADENCE_BBP_URL . 'assets/forum-overrides.css',
+		array( 'zf-kadence-bbpress' ),
+		ZF_KADENCE_BBP_VERSION
+	);
+
 	$inline_css = sprintf(
 		':root{--zf-forum-accent:%1$s;--zf-forum-accent-dark:%2$s;--zf-forum-max-width:%3$dpx;}',
 		esc_html( $settings['accent_color'] ),
@@ -506,12 +577,12 @@ function zf_kadence_bbp_enqueue_assets() {
 		absint( $settings['max_content_width'] )
 	);
 
-	wp_add_inline_style( 'zf-kadence-bbpress', $inline_css );
+	wp_add_inline_style( 'zf-kadence-bbpress-overrides', $inline_css );
 
 	$custom_css = trim( (string) ( isset( $settings['custom_css'] ) ? $settings['custom_css'] : '' ) );
 
 	if ( '' !== $custom_css ) {
-		wp_add_inline_style( 'zf-kadence-bbpress', "\n/* Zwembadforum custom forum CSS */\n" . $custom_css );
+		wp_add_inline_style( 'zf-kadence-bbpress-overrides', "\n/* Zwembadforum custom forum CSS */\n" . $custom_css );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'zf_kadence_bbp_enqueue_assets', 50 );
@@ -628,6 +699,34 @@ function zf_kadence_bbp_format_user_display_name( $display_name ) {
 	return $display_name;
 }
 
+function zf_kadence_bbp_remove_callback_from_hook( $hook_name, $callback_name ) {
+	global $wp_filter;
+
+	if ( empty( $wp_filter[ $hook_name ] ) || ! isset( $wp_filter[ $hook_name ]->callbacks ) || ! is_array( $wp_filter[ $hook_name ]->callbacks ) ) {
+		return;
+	}
+
+	foreach ( $wp_filter[ $hook_name ]->callbacks as $priority => $callbacks ) {
+		if ( empty( $callbacks ) || ! is_array( $callbacks ) ) {
+			continue;
+		}
+
+		foreach ( $callbacks as $callback_id => $callback ) {
+			if ( empty( $callback['function'] ) || ! is_string( $callback['function'] ) ) {
+				continue;
+			}
+
+			if ( $callback_name === $callback['function'] ) {
+				unset( $wp_filter[ $hook_name ]->callbacks[ $priority ][ $callback_id ] );
+			}
+		}
+
+		if ( empty( $wp_filter[ $hook_name ]->callbacks[ $priority ] ) ) {
+			unset( $wp_filter[ $hook_name ]->callbacks[ $priority ] );
+		}
+	}
+}
+
 function zf_kadence_bbp_patch_bbpress_display_name_filter() {
 	if ( ! function_exists( 'remove_filter' ) ) {
 		return;
@@ -635,6 +734,8 @@ function zf_kadence_bbp_patch_bbpress_display_name_filter() {
 
 	remove_filter( 'bbp_get_topic_author_display_name', 'bbp_format_user_display_name' );
 	remove_filter( 'bbp_get_reply_author_display_name', 'bbp_format_user_display_name' );
+	zf_kadence_bbp_remove_callback_from_hook( 'bbp_get_topic_author_display_name', 'bbp_format_user_display_name' );
+	zf_kadence_bbp_remove_callback_from_hook( 'bbp_get_reply_author_display_name', 'bbp_format_user_display_name' );
 
 	add_filter( 'bbp_get_topic_author_display_name', 'zf_kadence_bbp_format_user_display_name', 5 );
 	add_filter( 'bbp_get_reply_author_display_name', 'zf_kadence_bbp_format_user_display_name', 5 );

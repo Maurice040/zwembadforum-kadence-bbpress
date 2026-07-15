@@ -1,9 +1,9 @@
 {
-  "version": "0.6.9",
-  "download_url": "https://github.com/Maurice040/zwembadforum-kadence-bbpress/releases/download/v0.6.9/zwembadforum-kadence-bbpress-0.6.9.zip",
+  "version": "0.6.13",
+  "download_url": "https://github.com/Maurice040/zwembadforum-kadence-bbpress/releases/download/v0.6.13/zwembadforum-kadence-bbpress-0.6.13.zip",
   "homepage": "https://zwembadforum.eu",
   "requires": "6.3",
   "requires_php": "7.0",
   "tested": "6.9",
-  "changelog": "<ul><li>Voegt een hardere, specifieke MU-error-handler toe voor alleen de <code>seems_utf8()</code>-deprecated melding uit bbPress op WordPress 6.9.</li><li>Haakt de oude bbPress display-name filter op extra momenten los.</li><li>Voegt een onderhoudsendpoint toe om de MU-compatibiliteitslaag opnieuw te installeren zonder pluginzip.</li></ul>"
+  "changelog": "<ul><li>Verplaatst de bestaande live forum-CSS naar een cachebaar extern bestand, waardoor circa 57 KB inline broncode per pagina verdwijnt.</li><li>Maakt vóór de migratie een databaseback-up en wist het CSS-veld uitsluitend bij een exacte hashmatch.</li><li>Behoudt het CSS-veld voor kleine toekomstige hotfixes.</li></ul>"
 }

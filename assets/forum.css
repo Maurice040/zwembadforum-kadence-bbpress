@@ -1263,3 +1263,66 @@
 		padding-bottom: 1rem;
 	}
 }
+
+/* v0.6.12: fix broken forum-index title wrapping and mobile alignment. */
+.zf-forum-view-index #bbpress-forums .bbp-forum-info {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	grid-template-areas:
+		"thumb title"
+		"thumb content"
+		"thumb subforums";
+	column-gap: 0.85rem;
+	row-gap: 0.32rem;
+	align-items: start;
+	min-width: 0;
+}
+
+.zf-forum-view-index #bbpress-forums .bsp_thumbnail {
+	grid-area: thumb;
+	grid-row: 1 / span 3;
+	align-self: start;
+}
+
+.zf-forum-view-index #bbpress-forums .bbp-forum-title {
+	grid-area: title;
+	display: block;
+	min-width: 0;
+	line-height: 1.18;
+	word-break: normal;
+	overflow-wrap: anywhere;
+}
+
+.zf-forum-view-index #bbpress-forums .bbp-forum-content {
+	grid-area: content;
+	grid-column: auto;
+	max-width: none;
+	margin: 0;
+}
+
+.zf-forum-view-index #bbpress-forums .bbp-forums-list {
+	grid-area: subforums;
+	grid-column: auto;
+	margin-top: 0.2rem;
+}
+
+@media (max-width: 900px) {
+	.zf-forum-view-index #bbpress-forums .bbp-forum-info {
+		grid-template-columns: auto minmax(0, 1fr);
+	}
+}
+
+@media (max-width: 600px) {
+	.zf-forum-view-index #bbpress-forums .bbp-forum-info {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"title"
+			"content"
+			"subforums";
+		row-gap: 0.28rem;
+	}
+
+	.zf-forum-view-index #bbpress-forums .bbp-forum-title {
+		font-size: 1.02rem;
+	}
+}

@@ -15,7 +15,7 @@ Beheerbare frontendlaag voor bbPress op Kadence.
 - Stylet optioneel de bestaande Bouwzelfjezwembad bannerpositie onder de vraag.
 - Kan de advertentie onder de vraag zelf beheren met wisselende banners, zodat de losse `bbp affiliate ads` plugin later uit kan.
 - Heeft een instellingenpagina onder `Instellingen > Zwembadforum bbPress`.
-- Heeft een leesbaar Forum CSS veld waarmee styling kan worden aangepast zonder pluginupdate.
+- Heeft een leesbaar Forum CSS veld voor kleine hotfixes zonder pluginupdate; de vaste styling wordt cachebaar als extern bestand geladen.
 - Heeft een REST endpoint voor beheer via application password:
   `/wp-json/zf-kadence-bbpress/v1/settings`.
 - Heeft een eigen updatechecker op basis van een JSON manifest, zodat toekomstige versies via de normale WordPress plugin-updater kunnen lopen.
